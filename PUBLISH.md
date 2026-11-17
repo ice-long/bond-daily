@@ -34,6 +34,8 @@ GitHub Pages 托管网页和数据文件。GitHub Actions 读取给定的行情�
 
 设置完成后用 **Run workflow** 验证一次。之后 GitHub Actions 每天北京时间 **20:37** 触发。页面中的“刷新行情”读取最近已发布的快照，仓库里的 **Run workflow** 重新取数并发布。
 
+公开仓库连续 60 天没有活动时，GitHub 会停用定时工作流，可在 Actions 页面重新启用。参见 [GitHub 定时工作流说明](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)。
+
 ## 本地预览
 
 在项目目录执行以下命令。使用 Python 3.11 或以上版本，输出到一个新的空目录。
