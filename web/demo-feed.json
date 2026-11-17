@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "source": "模拟行情",
+  "snapshots": [
+    {
+      "date": "2026-01-07", "source_time": "2026-01-07T20:00:00+08:00",
+      "records": [
+        {"code":"DEMO-001", "name":"示例国债 10 年", "category":"国债", "term_years":9.43, "net_price":100.36, "latest_yield":1.6800, "weighted_yield":1.6765, "change_bp":0.75, "volume":81.6},
+        {"code":"DEMO-002", "name":"示例国债 30 年", "category":"国债", "term_years":28.64, "net_price":105.18, "latest_yield":2.1535, "weighted_yield":2.1502, "change_bp":0.35, "volume":45.2},
+        {"code":"DEMO-003", "name":"示例国开债 10 年", "category":"国开债", "term_years":9.58, "net_price":102.78, "latest_yield":1.8230, "weighted_yield":1.8164, "change_bp":1.10, "volume":106.5},
+        {"code":"DEMO-004", "name":"示例国开债 3 年", "category":"国开债", "term_years":2.81, "net_price":100.11, "latest_yield":1.5500, "weighted_yield":1.5496, "change_bp":-0.45, "volume":51.8},
+        {"code":"DEMO-005", "name":"示例农发债 5 年", "category":"农发债", "term_years":4.76, "net_price":101.22, "latest_yield":1.6475, "weighted_yield":1.6440, "change_bp":0.25, "volume":34.3},
+        {"code":"DEMO-006", "name":"示例进出口行债 1 年", "category":"进出口行债", "term_years":0.92, "net_price":99.85, "latest_yield":1.3929, "weighted_yield":1.3940, "change_bp":-0.20, "volume":null}
+      ]
+    },
+    {
+      "date": "2026-01-06", "source_time": "2026-01-06T20:00:00+08:00",
+      "records": [
+        {"code":"DEMO-001", "name":"示例国债 10 年", "category":"国债", "term_years":9.44, "net_price":100.43, "latest_yield":1.6725, "weighted_yield":1.6685, "change_bp":0.25, "volume":67},
+        {"code":"DEMO-002", "name":"示例国债 30 年", "category":"国债", "term_years":28.65, "net_price":105.27, "latest_yield":2.1500, "weighted_yield":2.1481, "change_bp":0.22, "volume":48},
+        {"code":"DEMO-003", "name":"示例国开债 10 年", "category":"国开债", "term_years":9.59, "net_price":102.88, "latest_yield":1.8120, "weighted_yield":1.8064, "change_bp":0.75, "volume":79.5},
+        {"code":"DEMO-004", "name":"示例国开债 3 年", "category":"国开债", "term_years":2.82, "net_price":100.10, "latest_yield":1.5545, "weighted_yield":1.5500, "change_bp":0.10, "volume":49},
+        {"code":"DEMO-005", "name":"示例农发债 5 年", "category":"农发债", "term_years":4.77, "net_price":101.23, "latest_yield":1.6450, "weighted_yield":1.6425, "change_bp":0.35, "volume":33.1},
+        {"code":"DEMO-006", "name":"示例进出口行债 1 年", "category":"进出口行债", "term_years":0.93, "net_price":99.85, "latest_yield":1.3949, "weighted_yield":1.3950, "change_bp":-0.21, "volume":15.2}
+      ]
+    },
+    {
+      "date": "2026-01-05", "source_time": "2026-01-05T20:00:00+08:00",
+      "records": [
+        {"code":"DEMO-001", "name":"示例国债 10 年", "category":"国债", "term_years":9.45, "net_price":100.46, "latest_yield":1.6700, "weighted_yield":1.6710, "change_bp":0.10, "volume":52},
+        {"code":"DEMO-002", "name":"示例国债 30 年", "category":"国债", "term_years":28.66, "net_price":105.32, "latest_yield":2.1478, "weighted_yield":2.1450, "change_bp":0.35, "volume":39},
+        {"code":"DEMO-003", "name":"示例国开债 10 年", "category":"国开债", "term_years":9.60, "net_price":102.95, "latest_yield":1.8045, "weighted_yield":1.8020, "change_bp":0.20, "volume":70.1},
+        {"code":"DEMO-004", "name":"示例国开债 3 年", "category":"国开债", "term_years":2.83, "net_price":100.10, "latest_yield":1.5535, "weighted_yield":1.5520, "change_bp":0.15, "volume":39.2},
+        {"code":"DEMO-005", "name":"示例农发债 5 年", "category":"农发债", "term_years":4.78, "net_price":101.25, "latest_yield":1.6415, "weighted_yield":1.6400, "change_bp":0.13, "volume":30},
+        {"code":"DEMO-006", "name":"示例进出口行债 1 年", "category":"进出口行债", "term_years":0.94, "net_price":99.85, "latest_yield":1.3970, "weighted_yield":1.3960, "change_bp":0.10, "volume":15.6}
+      ]
+    }
+  ]
+}
