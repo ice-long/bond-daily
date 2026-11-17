@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="查看国债与政策性金融债的成交快照与个券走势。">
   <title>利率债 · 每日观察</title>
-  <link rel="stylesheet" href="./style.css">
-  <script src="./dashboard.js" defer></script>
+  <link rel="stylesheet" href="./style.css?v=2">
+  <script src="./csv-import.js" defer></script>
+  <script src="./dashboard.js?v=2" defer></script>
 </head>
 <body>
   <header class="hero">
@@ -32,10 +33,13 @@
       <div class="panel-heading">
         <div><h2 id="quote-title">每日行情</h2><p id="row-count" aria-live="polite">正在读取数据</p></div>
         <div class="actions">
+          <button id="open-csv" type="button">打开本机 CSV</button>
+          <input id="local-files" type="file" accept=".csv,text/csv" multiple hidden>
           <button id="reload" type="button">刷新行情</button>
           <button class="primary" id="export" type="button" disabled>导出 CSV</button>
         </div>
       </div>
+      <p class="hint import-status" id="import-status" role="status" hidden></p>
       <div class="filters">
         <label>行情日期<select id="date" aria-label="行情日期" disabled></select></label>
         <label>券种<select id="category">
@@ -59,6 +63,7 @@
             <th scope="col"><button class="sort" type="button" data-sort="weighted_yield">加权收益率 <small>%</small></button></th>
             <th scope="col"><button class="sort" type="button" data-sort="change_bp">涨跌 <small>BP</small></button></th>
             <th scope="col"><button class="sort" type="button" data-sort="volume">交易量 <small>亿</small></button></th>
+            <th scope="col" id="quote-state-heading" hidden>行情状态</th>
           </tr></thead>
           <tbody id="rows"></tbody>
         </table>
@@ -82,7 +87,7 @@
 
     <footer>
       <span id="source">成交行情快照 · 北京时间</span>
-      <div><a href="./data/latest.json" target="_blank" rel="noopener">最新行情 JSON ↗</a>
+      <div><a id="latest-json" href="./data/latest.json" target="_blank" rel="noopener">最新行情 JSON ↗</a>
         <a id="manage" href="#" target="_blank" rel="noopener" hidden>GitHub 更新记录 ↗</a></div>
     </footer>
   </main>

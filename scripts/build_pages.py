@@ -106,7 +106,7 @@ def build_site(output, feed, mode):
     if output.exists() and any(output.iterdir()):
         raise ValueError("请指定新的空输出目录。")
     output.mkdir(parents=True, exist_ok=True)
-    for filename in ("index.html", "style.css", "dashboard.js"):
+    for filename in ("index.html", "style.css", "csv-import.js", "dashboard.js"):
         shutil.copyfile(ROOT / "web" / filename, output / filename)
     (output / ".nojekyll").touch()
     repo = os.environ.get("GITHUB_REPOSITORY", "")

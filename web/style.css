@@ -46,11 +46,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
 .panel-heading h2 { margin: 0; font-size: 1.22rem; }
 .panel-heading p, .hint { margin: 5px 0 0; color: var(--muted); font-size: .83rem; }
-.actions { display: flex; gap: 8px; }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .actions button { border: 1px solid var(--line); border-radius: 7px; padding: 8px 12px; background: #fff; color: var(--ink); white-space: nowrap; }
 .actions button:hover { background: #eff5f7; }
 .actions .primary { background: var(--teal); border-color: var(--teal); color: #fff; }
 .actions .primary:hover { background: #065b66; }
+.import-status { margin: 0 0 13px; }
+.import-status[data-kind="error"] { color: #922d27; }
 .filters { display: grid; grid-template-columns: 1fr 1fr 1fr 1.45fr; gap: 12px; margin-bottom: 15px; }
 label { display: grid; gap: 6px; font-size: .83rem; font-weight: 620; color: #425773; }
 input, select { width: 100%; border: 1px solid #ccd9e5; border-radius: 7px; padding: 8px 10px; background: #f8fafc; color: var(--ink); min-height: 39px; font-weight: 400; }

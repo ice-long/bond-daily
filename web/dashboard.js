@@ -8,7 +8,7 @@ const columns = [
   ["change_bp", "涨跌（BP）"], ["volume", "交易量（亿）"],
 ];
 const metricUnits = {latest_yield: "%", net_price: "元", volume: "亿"};
-const state = {manifest: null, snapshot: null, rows: [], series: [], sort: "volume", descending: true};
+const state = {manifest: null, snapshot: null, local: null, rows: [], series: [], sort: "volume", descending: true};
 const get = (id) => document.getElementById(id);
 const option = (label, value = label) => new Option(label, value);
 
@@ -71,12 +71,13 @@ function showRows() {
       if (key === "change_bp" && row[key]) cell.className = row[key] > 0 ? "positive" : "negative";
       tr.append(cell);
     }
+    if (state.local) tr.append(element("td", row.quote_state || "—"));
     body.append(tr);
   }
   if (!state.rows.length) {
     const row = element("tr");
     const message = element("td", "当前筛选没有匹配的债券。", "empty");
-    message.colSpan = columns.length;
+    message.colSpan = columns.length + (state.local ? 1 : 0);
     row.append(message);
     body.append(row);
   }
@@ -93,12 +94,23 @@ function showRows() {
 function showSnapshot() {
   const snapshot = state.snapshot;
   const demo = snapshot.mode === "demo";
-  get("mode").textContent = demo ? "模拟行情" : "行情快照";
+  get("mode").textContent = state.local ? "本机 CSV" : (demo ? "模拟行情" : "行情快照");
   get("mode").dataset.mode = snapshot.mode;
   get("hero-date").textContent = snapshot.date;
-  get("source-time").textContent = `来源时间 ${snapshot.source_time.slice(11, 16)} · 北京时间`;
+  const clock = snapshot.source_time?.match(/[T ](\d{2}:\d{2})/)?.[1];
+  get("source-time").textContent = clock ? `来源时间 ${clock} · 北京时间` : "行情日期";
   get("source").textContent = `来源 ${snapshot.source} · 北京时间`;
-  notice(demo ? "示例网页使用虚构的债券和行情数值。" : `数据来源 ${snapshot.source}`, demo ? "demo" : "info");
+  if (state.local) {
+    notice(`已打开 ${state.local.size} 个行情日期。文件仅在当前标签页读取，重开网页后可重新导入。`, "info");
+  } else {
+    notice(demo ? "示例网页使用虚构的债券和行情数值。" : `数据来源 ${snapshot.source}`, demo ? "demo" : "info");
+  }
+  get("reload").textContent = state.local ? "返回在线版" : "刷新行情";
+  get("quote-state-heading").hidden = !state.local;
+  get("latest-json").hidden = Boolean(state.local);
+  const repo = state.manifest.repository;
+  get("manage").hidden = !repo || Boolean(state.local);
+  if (repo) get("manage").href = `https://github.com/${repo}/actions/workflows/publish-pages.yml`;
   get("summary").replaceChildren(...categories.map((category) => {
     const card = element("div", undefined, "tile");
     const count = element("strong", snapshot.records.filter((row) => row.category === category).length);
@@ -111,27 +123,68 @@ function showSnapshot() {
   if (first) void selectBond(first);
 }
 
+function showView(manifest, snapshot, local = null) {
+  if (state.manifest !== manifest) {
+    get("date").replaceChildren(...manifest.dates.map((day) => option(day)));
+  }
+  get("date").value = snapshot.date;
+  state.manifest = manifest;
+  state.snapshot = snapshot;
+  state.local = local;
+  showSnapshot();
+}
+
 async function loadSnapshot(refresh = false) {
+  if (!refresh && state.local) {
+    const local = state.local;
+    showView(state.manifest, local.get(get("date").value), local);
+    return;
+  }
+  const request = Symbol();
+  state.snapshotRequest = request;
   get("reload").disabled = true;
   get("date").disabled = true;
   try {
-    if (refresh || !state.manifest) {
-      const manifest = await readJson("./data/index.json");
-      get("date").replaceChildren(...manifest.dates.map((day) => option(day)));
-      state.manifest = manifest;
-      if (manifest.repository) {
-        get("manage").href = `https://github.com/${manifest.repository}/actions/workflows/publish-pages.yml`;
-        get("manage").hidden = false;
-      }
-    }
-    const day = get("date").value;
-    state.snapshot = await readJson(`./data/${day}.json`);
-    showSnapshot();
+    const manifest = refresh || !state.manifest ? await readJson("./data/index.json") : state.manifest;
+    if (state.snapshotRequest !== request) return;
+    const day = refresh ? manifest.dates[0] : (get("date").value || manifest.dates[0]);
+    const snapshot = await readJson(`./data/${day}.json`);
+    if (state.snapshotRequest !== request) return;
+    showView(manifest, snapshot);
+    get("import-status").hidden = true;
   } catch (error) {
-    notice(`行情读取失败。${error.message}。请点击“刷新行情”重试。`, "error");
+    if (state.snapshotRequest === request) {
+      notice(`在线行情读取失败。${error.message}。`, "error");
+      if (state.snapshot) get("date").value = state.snapshot.date;
+    }
   } finally {
+    if (state.snapshotRequest === request) {
+      get("reload").disabled = false;
+      get("date").disabled = !state.manifest;
+    }
+  }
+}
+
+async function importCsv(files) {
+  if (!files.length) return;
+  const status = get("import-status");
+  status.hidden = false;
+  status.dataset.kind = "info";
+  status.textContent = "正在打开本机文件…";
+  get("open-csv").disabled = true;
+  try {
+    const local = await openLocalSnapshots(files, categories, columns);
+    const dates = Array.from(local.keys()).sort().reverse();
+    state.snapshotRequest = Symbol();
+    showView({dates}, local.get(dates[0]), local);
+    get("date").disabled = false;
     get("reload").disabled = false;
-    get("date").disabled = !state.manifest;
+    status.hidden = true;
+  } catch (error) {
+    status.dataset.kind = "error";
+    status.textContent = error.message;
+  } finally {
+    get("open-csv").disabled = false;
   }
 }
 
@@ -144,7 +197,8 @@ async function selectBond(row, scroll = false) {
   get("chart-summary").textContent = "正在读取走势…";
   if (scroll) get("trend").scrollIntoView({block: "nearest"});
   try {
-    const values = await readJson(`./data/series/${encodeURIComponent(row.code)}.json`);
+    const values = state.local ? localBondSeries(state.local, row.code) :
+      await readJson(`./data/series/${encodeURIComponent(row.code)}.json`);
     if (state.seriesRequest !== request) return;
     state.series = values;
     drawChart();
@@ -236,20 +290,28 @@ function csvCell(value) {
 
 function downloadCsv() {
   const snapshot = state.snapshot;
+  const exportColumns = state.local ? [...columns, ["quote_state", "行情状态"]] : columns;
+  const dataKind = snapshot.dataKind ?? (snapshot.mode === "demo" ? "模拟行情" : "成交行情快照");
   const csv = [
-    ["行情日期", ...columns.map(([, name]) => name), "来源时间", "来源", "数据性质"],
-    ...state.rows.map((row) => [snapshot.date, ...columns.map(([key]) => row[key]),
-      snapshot.source_time, snapshot.source, snapshot.mode === "demo" ? "模拟行情" : "成交行情快照"]),
+    ["行情日期", ...exportColumns.map(([, name]) => name), "来源时间", "来源", "数据性质"],
+    ...state.rows.map((row) => [snapshot.date, ...exportColumns.map(([key]) => row[key]),
+      snapshot.source_time, snapshot.source, dataKind]),
   ].map((row) => row.map(csvCell).join(",")).join("\r\n");
   const url = URL.createObjectURL(new Blob(["\uFEFF", csv], {type: "text/csv;charset=utf-8"}));
   const link = element("a");
-  link.download = `利率债_${snapshot.date}${snapshot.mode === "demo" ? "_示例" : ""}.csv`;
+  link.download = `利率债_${snapshot.date}${dataKind === "模拟行情" ? "_示例" : ""}.csv`;
   link.href = url;
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 get("reload").addEventListener("click", () => loadSnapshot(true));
+get("open-csv").addEventListener("click", () => get("local-files").click());
+get("local-files").addEventListener("change", (event) => {
+  const files = Array.from(event.target.files);
+  event.target.value = "";
+  void importCsv(files);
+});
 get("date").addEventListener("change", () => loadSnapshot());
 get("export").addEventListener("click", downloadCsv);
 get("search").addEventListener("input", showRows);
